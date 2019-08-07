@@ -1,0 +1,28 @@
+###########################################
+# Syntax Coloring Map For Snake Game ######
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+RobotClass_SnakeGame	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+setPixel	KEYWORD2
+drawFrame	KEYWORD2
+drawIntro	KEYWORD2
+drawGameover	KEYWORD2
+drawInterface	KEYWORD2
+setup	KEYWORD2
+draw	KEYWORD2
+handler	KEYWORD2
+resetGame	KEYWORD2
+setGameFrame	KEYWORD2
+setPallete	KEYWORD2
+st_itoa		KEYWORD2
+###########################################
+# Constants (LITERAL1)
+###########################################
