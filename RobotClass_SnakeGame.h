@@ -38,6 +38,8 @@
 #define SNAKE_SIZE 3
 #define HALF_SNAKE_SIZE SNAKE_SIZE/2
 
+#define FOOD_MAX_Q 5
+
 #define RESET_TIMEOUT 5000
 #define CTRL_TIMEOUT 50
 #define BEEP_TIMEOUT 100
@@ -93,16 +95,15 @@ class RobotClass_SnakeGame {
         uint8_t snake_size = 1;
         
         // food coords
-        uint16_t food[2];
+        uint16_t food[FOOD_MAX_Q][2];
 
         //void sound( uint8_t play, unsigned long time );
         void beep();
-        uint8_t checkEat();
+        int8_t checkEat();
         void drawSnake();
-        void drawSnakeSegment( uint16_t x, uint16_t y);
+        void drawSnakeSegment(uint16_t x, uint16_t y);
         void drawFood();
-        void removeFood();
-        void placeFood();
+        void replaceFood(uint8_t i);
         void play();
         void playMelody(uint8_t m, uint8_t cycle);
 };

@@ -114,18 +114,20 @@ void RobotClass_SnakeGame::handler(){
          // draw snake
         } else {
             // rise snake on feeding
-            if( checkEat() ){
+            int8_t food = checkEat();
+            if( food>=0 ){
                 player_points++;
 
-                //removeFood(); // remove old food
-                placeFood(); // set new food
+                replaceFood(food); // set new food
 
                 rise_snake = 1;
                 snake_size++;
                 // speed up snake
                 //update_timeout = 300 - 20*(snake_size>>2);
-                if( update_timeout )
+                if( update_timeout >= SNAKE_SPEEDUP )
                     update_timeout -= SNAKE_SPEEDUP;
+                else
+                    update_timeout = 0;
                 beep();
             }
         }
@@ -144,7 +146,9 @@ void RobotClass_SnakeGame::resetGame(){
     snake[0][1] = half_height;
 
     // set food
-    placeFood();
+    for( uint8_t i=0; i<FOOD_MAX_Q; i++ ){
+        replaceFood(i);
+    }
 
     mode = MODE_READY;
 }
@@ -167,15 +171,20 @@ void RobotClass_SnakeGame::beep(){
     tone(pinSpeaker, 147, BEEP_TIMEOUT);
 }
 
-uint8_t RobotClass_SnakeGame::checkEat(){
-  if( SNAKE_SIZE == 1 ){
-      return snake[0][X1]==food[X1] && snake[0][Y1]==food[Y1];
-  } else {
-      return snake[0][X1]-HALF_SNAKE_SIZE < food[X1]+HALF_SNAKE_SIZE && 
-      snake[0][X1]+HALF_SNAKE_SIZE > food[X1]-HALF_SNAKE_SIZE && 
-      snake[0][Y1]-HALF_SNAKE_SIZE < food[Y1]+HALF_SNAKE_SIZE && 
-      snake[0][Y1]+HALF_SNAKE_SIZE > food[Y1]-HALF_SNAKE_SIZE;
-  }
+int8_t RobotClass_SnakeGame::checkEat(){
+    for( uint8_t i=0; i<FOOD_MAX_Q; i++ ){
+        if( SNAKE_SIZE == 1 ){
+            if( snake[0][X1]==food[i][X1] && snake[0][Y1]==food[i][Y1] )
+                return i;
+        } else {
+            if( snake[0][X1]-HALF_SNAKE_SIZE < food[i][X1]+HALF_SNAKE_SIZE && 
+            snake[0][X1]+HALF_SNAKE_SIZE > food[i][X1]-HALF_SNAKE_SIZE && 
+            snake[0][Y1]-HALF_SNAKE_SIZE < food[i][Y1]+HALF_SNAKE_SIZE && 
+            snake[0][Y1]+HALF_SNAKE_SIZE > food[i][Y1]-HALF_SNAKE_SIZE )
+                return i;
+        }
+    }
+    return -1;
 }
 
 void RobotClass_SnakeGame::drawSnake(){
@@ -196,23 +205,21 @@ void RobotClass_SnakeGame::drawSnakeSegment(uint16_t x, uint16_t y){
 }
 
 void RobotClass_SnakeGame::drawFood(){
-    if( SNAKE_SIZE == 1 ){
-        setPixel(food[0], food[1], pallete[COLOR_RED]);
-    } else {
-        for( uint8_t i=0; i<SNAKE_SIZE; i++){
-            setPixel(food[0]-HALF_SNAKE_SIZE+i, food[1], pallete[COLOR_RED]);
-            setPixel(food[0], food[1]-HALF_SNAKE_SIZE+i, pallete[COLOR_RED]);
+    for( uint8_t f=0; f<FOOD_MAX_Q; f++ ){
+        if( SNAKE_SIZE == 1 ){
+            setPixel(food[f][0], food[f][1], pallete[COLOR_RED]);
+        } else {
+            for( uint8_t i=0; i<SNAKE_SIZE; i++){
+                setPixel(food[f][X1]-HALF_SNAKE_SIZE+i, food[f][Y1], pallete[COLOR_RED]);
+                setPixel(food[f][X1], food[f][Y1]-HALF_SNAKE_SIZE+i, pallete[COLOR_RED]);
+            }
         }
     }
 }
 
-void RobotClass_SnakeGame::removeFood(){
-//  setPixel(food[0], food[1], pallete[COLOR_BLACK]);
-}
-
-void RobotClass_SnakeGame::placeFood(){
-  food[0] = random(game_frame[X1]+1, game_frame[X2]-1);
-  food[1] = random(game_frame[Y1]+1, game_frame[Y2]-1);
+void RobotClass_SnakeGame::replaceFood(uint8_t i){
+    food[i][0] = random(game_frame[X1]+1, game_frame[X2]-1);
+    food[i][1] = random(game_frame[Y1]+1, game_frame[Y2]-1);
 }
 
 void  RobotClass_SnakeGame::play(){
